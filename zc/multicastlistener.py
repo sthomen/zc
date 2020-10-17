@@ -12,7 +12,7 @@ class MulticastListener(socket.socket):
 			if hasattr(socket, "SO_REUSEPORT"):
 				self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
-		self.addr = None
+		self.mcast_addr = None
 
 	def guessmyip(self):
 		"""
@@ -44,7 +44,7 @@ class MulticastListener(socket.socket):
 		)
 
 		# Store this for later
-		self.addr = addr
+		self.mcast_addr = (addr, port)
 
 		return self
 
@@ -55,18 +55,29 @@ class MulticastListener(socket.socket):
 
 		:param length int: Maximum packet length to listen for
 		"""
-		if not self.addr:
+		if not self.mcast_addr:
 			raise IllegalState("Attempted to listen before registering")
 
 		data, remote_addr = self.recvfrom(length)
 		return (data, remote_addr)
+
+	def send(self, message):
+		"""
+		Send a multicast packet
+
+		:param message bytes: The packet to send
+		"""
+		if not self.mcast_addr:
+			raise IllegalState("Attempted to send before registering")
+
+		self.sendto(message, self.mcast_addr)
 
 	def unregister(self):
 		"""
 		Unregister from the current multicast group
 		"""
 
-		if not self.addr:
+		if not self.mcast_addr:
 			raise IllegalState("Attempted to unregister before registering")
 
 		self.setsockopt(
@@ -75,7 +86,7 @@ class MulticastListener(socket.socket):
 			socket.inet_aton(self.addr) + socket.inet_aton('0.0.0.0')
 		)
 
-		self.addr = None
+		self.mcast_addr = None
 
 		return self
 
