@@ -1,4 +1,4 @@
-from struct import unpack
+from struct import pack,unpack
 
 class Data(dict):
 	"""
@@ -15,6 +15,9 @@ class Data(dict):
 		if raw:
 			self.decode()
 
+	def __bytes__(self):
+		return self.encode().raw
+
 	def __getattr__(self, key):
 		if key in self:
 			return self[key]
@@ -24,10 +27,31 @@ class Data(dict):
 	def __setattr__(self, key, value):
 		self[key] = value
 
-class Flags(Data):
-	REQUEST  = 0
-	RESPONSE = 1
+	def decode(self):
+		"""
+		Stub decode method
 
+		"""
+		return self
+
+	def encode(self):
+		"""
+		Stub encode method
+
+		"""
+		return self
+
+class Flags(Data):
+	# QR values
+	REQUEST  = False
+	RESPONSE = True
+
+	# OpCode values
+	QUERY    = 0
+	IQUERY   = 1
+	STATUS   = 2
+
+	# RCode values
 	NOERROR  = 0
 	FORMERR  = 1
 	SERVFAIL = 2
@@ -44,13 +68,28 @@ class Flags(Data):
 		"""
 		Decode message flags
 
-									   1  1  1  1  1  1
+		                               1  1  1  1  1  1
 		 0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
 		+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
 		|QR|   OpCode  |AA|TC|RD|RA| Z|AD|CD|   RCODE   |
 		+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
 
 		QR: 0 = request, 1 = response
+
+		OpCode:
+			QUERY     0 A standard query
+			IQUERY    1 An inverse query
+			STATUS    2 A server status request
+
+			3-15 unused(?)
+
+		AA: Authoritative answer, true if autoritative
+		TC: Truncation - this message was truncated due to length
+		RD: Recursion Desired
+		RA: Recursion Available
+		Z:  Reserved
+		AD: ?
+		CD: ?
 
 		RCODE:
 			NOERROR   0 No error
@@ -68,8 +107,8 @@ class Flags(Data):
 
 		:param flags int: Flags bitfield
 		"""
-		self.qr     = bool(self.raw >> 15)
-		self.opcode = (self.raw >> 11) & 0xf
+		self.qr     = bool((self.raw >> 15))
+		self.opcode = (self.raw      >> 11) & 0xf
 		self.aa     = bool((self.raw >> 10) & 0x1)
 		self.tc     = bool((self.raw >> 9) & 0x1)
 		self.rd     = bool((self.raw >> 8) & 0x1)
@@ -81,22 +120,72 @@ class Flags(Data):
 
 		return self
 
+	def encode(self):
+		"""
+		Encode the values in the flags back to a binary set of 16 bits
+
+		See decode for the format
+
+		"""
+		value = 0
+
+		if self.qr:     value |= 1 << 15
+		if self.opcode: value |= self.opcode << 11
+		if self.aa:     value |= 1 << 10
+		if self.tc:     value |= 1 << 9
+		if self.rd:     value |= 1 << 8
+		if self.ra:     value |= 1 << 7
+		if self.z:      value |= 1 << 6
+		if self.ad:     value |= 1 << 5
+		if self.cd:     value |= 1 << 4
+		if self.rcode:  value |= self.rcode
+
+		self.raw = value
+
+		return self
+
 class Message(Data):
+	FORMAT = '!HHHHHH'
+
 	def decode(self):
 		"""
 		Decode a DNS message
 
 		:param raw bytes: The raw message
 		"""
-		(id, flags, zcount, pcount, ucount, acount) = unpack('!HHHHHH', self.raw[:12])
+		# Unpack the header
 
-		self.update({
-			'id':     id,
-			'flags':  Flags(flags),
-			'zcount': zcount,
-			'pcount': pcount,
-			'ucount': ucount,
-			'acount': acount
-		})
+		(
+			self.id,
+			flags,
+			self.zcount,
+			self.pcount,
+			self.ucount,
+			self.acount
+		) = unpack(self.FORMAT, self.raw[:12])
+
+		# Initialize flags
+		self.flags = Flags(flags)
+
+		# Load data parts
+		# TODO
+
+		return self
+
+	def encode(self):
+		# Encode the header
+
+		self.raw = pack(
+			self.FORMAT,
+			self.id,
+			flags.encode().raw,
+			self.zcount,
+			self.pcount,
+			self.ucount,
+			self.acount
+		)
+
+		# Encode the data parts
+		# TODO
 
 		return self
