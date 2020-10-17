@@ -9,6 +9,8 @@ class Flags(Data):
 	QUERY    = 0
 	IQUERY   = 1
 	STATUS   = 2
+	NOTIFY   = 4
+	UPDATE   = 5
 
 	# RCode values
 	NOERROR  = 0
@@ -39,8 +41,9 @@ class Flags(Data):
 			QUERY     0 A standard query
 			IQUERY    1 An inverse query
 			STATUS    2 A server status request
-
-			3-15 unused(?)
+			?         3
+			NOTIFY    4 AXFR notify?
+			UPDATE    5 dydns update?
 
 		AA: Authoritative answer, true if autoritative
 		TC: Truncation - this message was truncated due to length
