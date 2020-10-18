@@ -17,6 +17,9 @@ class Data(dict):
 	def __bytes__(self):
 		return self.encode().raw
 
+	def __repr__(self):
+		return ', '.join([ f"{k}: {v}" for k,v in self.items() if k != 'raw' ]).join([f'<{self.__class__.__name__}: ', '>'])
+
 	def __getattr__(self, key):
 		if key in self:
 			return self[key]
