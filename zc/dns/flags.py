@@ -66,8 +66,6 @@ class Flags(Data):
 			NOTAUTH   9 The server is not authorative for the zone named
 			NOTZONE  10 A name used in the Prerequisite or Update section is not
 						within the zone denoted by the Zone Section
-
-		:param flags int: Flags bitfield
 		"""
 		self.qr     = bool((self.raw >> 15))
 		self.opcode = (self.raw      >> 11) & 0xf
