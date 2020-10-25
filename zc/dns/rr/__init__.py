@@ -1,6 +1,8 @@
-from .ptr import PTR
 from .a import A
+from .ns import NS
+from .cname import CNAME
 from .null import NULL
+from .ptr import PTR
 from .txt import TXT
 from .aaaa import AAAA
 from .srv import SRV
@@ -14,14 +16,15 @@ RTYPE_TXT   = 16
 RTYPE_AAAA  = 28
 RTYPE_SRV   = 33
 
-# NULL just reads the data of the RR into self.raw
 mapping = {
-	RTYPE_A:    A,
-	RTYPE_NULL: NULL,
-	RTYPE_AAAA: AAAA,
-	RTYPE_PTR:  PTR,
-	RTYPE_TXT:  TXT,
-	RTYPE_SRV:  SRV
+	RTYPE_A:     A,
+	RTYPE_NS:    NS,
+	RTYPE_CNAME: CNAME,
+	RTYPE_NULL:  NULL,
+	RTYPE_PTR:   PTR,
+	RTYPE_TXT:   TXT,
+	RTYPE_AAAA:  AAAA,
+	RTYPE_SRV:   SRV
 }
 
 def getInstance(type, raw, offset, length):
