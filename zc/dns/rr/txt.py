@@ -1,7 +1,7 @@
 from struct import unpack
 
 from .rdata import RData
-from ..util import sub, read_labels
+from ..util import sub, decode_labels
 
 class TXT(RData):
 	"""

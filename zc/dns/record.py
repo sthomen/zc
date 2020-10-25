@@ -1,7 +1,7 @@
 from struct import pack, unpack
 
 from .recordbase import RecordBase
-from .util import sub, read_labels
+from .util import sub, decode_labels
 from . import rr
 
 class Record(RecordBase):
@@ -19,7 +19,7 @@ class Record(RecordBase):
 	"""
 
 	def decode(self):
-		offset, self.labels = read_labels(self.raw, self.offset)
+		offset, self.labels = decode_labels(self.raw, self.offset)
 		header = sub(self.raw, offset, 10)
 
 		if len(header) == 10:

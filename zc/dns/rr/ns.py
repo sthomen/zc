@@ -1,7 +1,7 @@
-from struct import unpack
+from struct import unpack, pack
 
 from .rdata import RData
-from ..util import sub,read_labels
+from ..util import sub, decode_labels, encode_labels
 
 class NS(RData):
 	"""
@@ -12,8 +12,8 @@ class NS(RData):
 	SOA:s. Tread with care.
 	"""
 	def decode(self):
-		offset, self.mname = read_labels(self.raw, self.offset)
-		offset, self.rname = read_labels(self.raw, offset)
+		offset, self.mname = decode_labels(self.raw, self.offset)
+		offset, self.rname = decode_labels(self.raw, offset)
 
 		footer = sub(self.raw, offset, 40)
 		if len(footer) == 40:
@@ -26,5 +26,19 @@ class NS(RData):
 			offset += 40
 
 		self.raw = sub(self.raw, self.offset, offset)
+
+		return self
+
+	def encode(self):
+		self.raw = bytes()
+		self.raw += encode_labels(self.mname)
+		self.raw += encode_labels(self.rname)
+
+		self.raw += pack('!IIIII', \
+			self.serial, \
+			self.refresh, \
+			self.retry, \
+			self.expire, \
+			self.minimum)
 
 		return self

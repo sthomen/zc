@@ -8,6 +8,12 @@ from .query import Query
 class Message(Data):
 	FORMAT = '!HHHHHH'
 
+	# Is anything but 1 used, ever?
+	CLASS_IN = 1
+	CLASS_CS = 2
+	CLASS_CH = 3
+	CLASS_HS = 4
+
 	SEC_QUESTION   = 0
 	SEC_ANSWER     = 1
 	SEC_NS         = 2
@@ -88,5 +94,9 @@ class Message(Data):
 			self.ncount,
 			self.xcount
 		)
+
+		for section in [ self.SEC_QUESTION, self.SEC_ANSWER, self.SEC_NS, self.SEC_ADDITIONAL ]:
+			for item in self.records[section]:
+				self.raw += item.encode().raw
 
 		return self

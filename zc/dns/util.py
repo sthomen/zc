@@ -3,7 +3,7 @@ from struct import unpack
 def sub(data: bytes, offset: int, length: int) -> bytes:
 	return data[offset:offset+length]
 
-def read_labels(raw: bytes, offset: int) -> tuple:
+def decode_labels(raw: bytes, offset: int) -> tuple:
 	"""
 	This method does the buffer gymnastics of unpacking a set of labels.
 
@@ -54,3 +54,17 @@ def read_labels(raw: bytes, offset: int) -> tuple:
 		offset = breakpoint
 
 	return (offset, labels)
+
+def encode_labels(labels: list) -> bytes:
+	label = bytes()
+
+	# append labels prefixed by their length
+	for name in labels:
+		length = len(name)
+		label += pack('!H', length)
+		label += name
+
+	# The null (root, zero length) label
+	label += b'\x00'
+
+	return label
