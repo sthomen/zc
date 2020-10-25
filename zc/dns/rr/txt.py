@@ -15,7 +15,7 @@ class TXT(RData):
 		offset = 0
 
 		while offset < self.length:
-			llen = int(unpack('!B', sub(self.raw, offset, 1))[0])
+			llen, = unpack('!B', sub(self.raw, offset, 1))
 
 			offset += 1
 
