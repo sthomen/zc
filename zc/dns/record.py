@@ -30,9 +30,8 @@ class Record(RecordBase):
 			self.rdata = rr.getInstance(self.type, self.raw, offset, self.rdlength)
 
 			if self.rdata:
-				offset += self.rdata.length
+				offset += len(self.rdata)
 
-		self.length = offset - self.offset
-		self.raw = sub(self.raw, self.offset, self.length)
+		self.raw = sub(self.raw, self.offset, offset - self.offset)
 
 		return self

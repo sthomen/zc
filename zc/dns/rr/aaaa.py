@@ -7,7 +7,6 @@ class AAAA(RData):
 	def decode(self):
 		self.raw = sub(self.raw, self.offset, 16)
 		self.address = [ int(v) for v in unpack('!BBBBBBBBBBBBBBBB', self.raw) ]
-		self.length = 16
 		return self
 
 	def encode(self):

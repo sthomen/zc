@@ -13,7 +13,7 @@ class SRV(RData):
 			offset += 6
 
 			offset, self.target = read_labels(self.raw, offset)
-			self.length = offset - self.offset
-			self.raw = sub(self.raw, self.offset, self.length)
+
+		self.raw = sub(self.raw, self.offset, offset - self.offset)
 
 		return self

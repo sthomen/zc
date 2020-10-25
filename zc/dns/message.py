@@ -16,23 +16,26 @@ class Message(Data):
 	def decode(self):
 		"""
 		Decode a DNS message
-
-		:param raw bytes: The raw message
 		"""
+
+		# Read the header
 		(
 			self.id,
 			flags,
-			self.qcount,	# Question
-			self.acount,	# Answer
-			self.ncount,	# Nameservers
-			self.xcount		# Additional records
+			self.qcount,
+			self.acount,
+			self.ncount,
+			self.xcount
 		) = unpack(self.FORMAT, self.raw[:12])
 
+		# Decode the flags
 		self.flags = Flags(flags)
 
+		# We're now at an offset of 12, store the packet length for later
 		offset=12
 		self.length = len(self.raw)
 
+		# Prime records dict
 		self.records = {
 			self.SEC_QUESTION:   [],
 			self.SEC_ANSWER:     [],
@@ -40,15 +43,21 @@ class Message(Data):
 			self.SEC_ADDITIONAL: []
 		}
 
+		# Record the "breakpoints" of the various records, this lets us slot
+		# them in the right section.
 		breakpoints = []
 		total = 0
 		for idx, cur in enumerate([ self.qcount, self.acount, self.ncount, self.xcount ]):
 			breakpoints.append(cur + total)
 			total += cur
 
+		# Start with questions
 		section = self.SEC_QUESTION
 
 		for index in range(0, total):
+			# If this is not a response (qr = True) then the record format
+			# lacks a bunch of fields and needs to be treated special. This
+			# could just as well check the section we're currently recording.
 			if self.flags.qr != True:
 				record = Query(self.raw, offset)
 			else:
@@ -61,6 +70,7 @@ class Message(Data):
 				if index < bp:
 					break
 
+			# Slot it in place
 			self.records[section].append(record)
 
 		return self
@@ -73,10 +83,10 @@ class Message(Data):
 			self.FORMAT,
 			self.id,
 			flags.encode().raw,
-			self.zcount,
-			self.pcount,
-			self.ucount,
-			self.acount
+			self.qcount,
+			self.acount,
+			self.ncount,
+			self.xcount
 		)
 
 		return self

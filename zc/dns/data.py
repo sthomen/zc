@@ -5,7 +5,8 @@ class Data(dict):
 	"""
 	def __init__(self, raw = None):
 		"""
-		Initialize data class with the raw, decoding it if set
+		Initialize data class with the raw, decoding it automatically
+		if set (not None)
 
 		:param raw bytes: Raw data bytes
 		"""
@@ -34,14 +35,14 @@ class Data(dict):
 
 	def decode(self):
 		"""
-		Stub decode method, reads from self.raw
+		Stub decode method
 
 		"""
-		return self
+		raise NotImplementedError(f"{self.__class__.__name__} does not implement decode()")
 
 	def encode(self):
 		"""
-		Stub encode method, writes to self.raw
+		Stub encode method
 
 		"""
-		return self
+		raise NotImplementedError(f"{self.__class__.__name__} does not implement encode()")

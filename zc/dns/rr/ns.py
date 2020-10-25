@@ -25,6 +25,6 @@ class NS(RData):
 
 			offset += 40
 
-		self.length = offset
+		self.raw = sub(self.raw, self.offset, offset)
 
 		return self
