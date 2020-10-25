@@ -27,7 +27,7 @@ mapping = {
 	RTYPE_SRV:   SRV
 }
 
-def getInstance(type, raw, offset, length):
+def byType(type, raw, offset, length):
 	rdata = None
 
 	if type in mapping:
