@@ -17,8 +17,11 @@ class Data(dict):
 	def __bytes__(self):
 		return self.encode().raw
 
+	def __len__(self):
+		return len(self.raw)
+
 	def __repr__(self):
-		return ', '.join([ f"{k}: {v}" for k,v in self.items() if k != 'raw' ]).join([f'<{self.__class__.__name__}: ', '>'])
+		return ', '.join([ f"{k}: {v}" for k, v in self.items() if k != 'raw' ]).join([f'<{self.__class__.__name__}: ', '>'])
 
 	def __getattr__(self, key):
 		if key in self:
@@ -31,14 +34,14 @@ class Data(dict):
 
 	def decode(self):
 		"""
-		Stub decode method
+		Stub decode method, reads from self.raw
 
 		"""
 		return self
 
 	def encode(self):
 		"""
-		Stub encode method
+		Stub encode method, writes to self.raw
 
 		"""
 		return self

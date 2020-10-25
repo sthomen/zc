@@ -2,6 +2,8 @@ from struct import pack,unpack
 
 from .data import Data
 from .flags import Flags
+from .record import Record
+from .query import Query
 
 class Message(Data):
 	FORMAT = '!HHHHHH'
@@ -26,8 +28,21 @@ class Message(Data):
 		# Initialize flags
 		self.flags = Flags(flags)
 
-		# Load data parts
-		# TODO
+		# Load the records
+
+		self.records = []
+
+		offset=12
+		self.length = len(self.raw)
+
+		for r in range(0, (self.zcount + self.pcount + self.ucount + self.acount)):
+			if self.flags.qr:
+				record = Record(self.raw, offset)
+			else:
+				record = Query(self.raw, offset)
+
+			offset+=len(record)
+			self.records.append(record)
 
 		return self
 
