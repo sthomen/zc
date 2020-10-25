@@ -11,7 +11,7 @@ class Data(dict):
 		"""
 		self.raw = raw
 
-		if raw:
+		if raw != None:
 			self.decode()
 
 	def __bytes__(self):
