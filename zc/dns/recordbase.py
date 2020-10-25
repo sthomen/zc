@@ -1,5 +1,3 @@
-from struct import pack, unpack
-
 from .data import Data
 from .util import sub
 

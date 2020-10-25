@@ -23,11 +23,14 @@ class Record(RecordBase):
 		header = sub(self.raw, offset, 10)
 
 		if len(header) == 10:
-			self.type, self['class'], self.ttl, self.rdlength = unpack('!HHIH', header)
+			self.type, \
+			self['class'], \
+			self.ttl, \
+			self.rdlength = unpack('!HHIH', header)
 
 			offset += 10
 
-			self.rdata = rr.getInstance(self.type, self.raw, offset, self.rdlength)
+			self.rdata = rr.byType(self.type, self.raw, offset, self.rdlength)
 
 			if self.rdata:
 				offset += len(self.rdata)
