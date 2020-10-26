@@ -1,5 +1,5 @@
 from struct import unpack
-from collections import OrderedDict()
+from collections import OrderedDict
 
 from .rdata import RData
 from ..util import sub, decode_labels
