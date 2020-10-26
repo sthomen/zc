@@ -1,6 +1,4 @@
-encode functions
-----------------
+TESTS!
+======
 
-- zc.dns.Record
-- zc.dns.rr.SRV
-- zc.dns.rr.TXT
+We need tests!

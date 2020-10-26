@@ -1,4 +1,5 @@
 from struct import unpack
+from collections import OrderedDict()
 
 from .rdata import RData
 from ..util import sub, decode_labels
@@ -23,5 +24,15 @@ class TXT(RData):
 			self.data[key] = value
 
 			offset += llen
+
+		return self
+
+	def encode(self):
+		self.raw = bytes()
+
+		for key, value in self.data.items():
+			value = b'='.join([ key, value ])
+			self.raw += pack('!B', len(value))
+			self.raw += value
 
 		return self

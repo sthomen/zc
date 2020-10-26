@@ -38,3 +38,14 @@ class Record(RecordBase):
 		self.raw = sub(self.raw, self.offset, offset - self.offset)
 
 		return self
+
+	def encode(self):
+		rdata = self.rdata.encode().raw
+		# update rdlength
+		self.rdlength = len(rdata)
+
+		self.raw = bytes()
+		self.raw += pack('!HHIH', self.type, self['class'], self.ttl, self.rdlength)
+		self.raw += rdata
+
+		return self

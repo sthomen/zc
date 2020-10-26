@@ -1,7 +1,7 @@
-from struct import unpack
+from struct import unpack, pack
 
 from .rdata import RData
-from ..util import sub, decode_labels
+from ..util import sub, decode_labels, encode_labels
 
 class SRV(RData):
 	def decode(self):
@@ -15,5 +15,12 @@ class SRV(RData):
 			offset, self.target = decode_labels(self.raw, offset)
 
 		self.raw = sub(self.raw, self.offset, offset - self.offset)
+
+		return self
+
+	def encode(self):
+		self.raw = bytes()
+		self.raw += pack('!HHH', self.priority, self.weight, self.port)
+		self.raw += encode_labels(self.target)
 
 		return self
