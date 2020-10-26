@@ -82,10 +82,17 @@ class Message(Data):
 		return self
 
 	def encode(self):
+		self.raw = bytes()
+
 		if not self.id:
 			self.id = 0
 
-		self.raw = pack(
+		self.qcount = len(self.records[self.SEC_QUESTION])
+		self.acount = len(self.records[self.SEC_ANSWER])
+		self.ncount = len(self.records[self.SEC_NS])
+		self.xcount = len(self.records[self.SEC_ADDITIONAL])
+
+		self.raw += pack(
 			self.FORMAT,
 			self.id,
 			flags.encode().raw,
