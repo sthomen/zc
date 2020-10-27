@@ -1,4 +1,4 @@
-from struct import unpack
+from struct import unpack, pack
 
 def sub(data: bytes, offset: int, length: int) -> bytes:
 	return data[offset:offset+length]
@@ -22,31 +22,37 @@ def decode_labels(raw: bytes, offset: int) -> tuple:
 	breakpoint = None
 
 	while offset < len(raw):
-		llen, first = unpack('!BB', sub(raw, offset, 2))
+		# Read a byte into llen and advance past it
+		llen, = unpack('!B', sub(raw, offset, 1))
+		offset += 1
 
 		if llen & ~0x3f == 0xc0:
-			# A pointer
-			# Store how far we got before jumping plus two bytes (length and first),
-			# this is where decoding will continue when the labels are done, but
-			# only record this value if it's the first jump
+			# If the first two bits of a length value are 1 and 1 (0xc)
+			# then this is a jump, and the following 14 bytes indicate where
+			# in the raw data we should jump to.
+
+			# Read a byte into target, then advanced past it
+			target, = unpack('!B', sub(raw, offset, 1))
+			offset += 1
+
+			# Store the breakpoint so we know where to return to when we're
+			# done jumping around, but only the first time since there may
+			# be multiple jumps
 			if breakpoint == None:
-				breakpoint = offset + 2
+				breakpoint = offset
 
-			# Use the original raw data, and find an offset
-			offset = ((llen & 0x3) << 14) | first
+			# Mask the first two indicator bits and merge the rest together
+			# into an offset to jump to
+			offset = ((llen & 0x3) << 14) | target
 
-			# Then continue reading
+			# Then continue reading there
 			continue
 
 		elif llen == 0:
-			# We're done, skip past the null byte and stop
-			offset += 1
+			# A length of 0 means that this is the null (root) label,
+			# stop decoding here
 			break
-		else:
-			# skip past length byte
-			offset += 1
 
-		# Store the label here
 		labels.append(sub(raw, offset, llen))
 		offset += llen
 
