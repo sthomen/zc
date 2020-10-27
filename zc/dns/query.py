@@ -15,12 +15,6 @@ class Query(RecordBase):
 	TYPE     2 bytes
 	CLASS    2 bytes
 
-	Name:
-	A domain name represented as a sequence of labels, where each label
-	consists of a length octet followed by that number of octets. The domain
-	name terminates with the zero length octet for the null label of the root.
-	Note that this field may be an odd number of octets; no padding is used.
-
 	"""
 	def decode(self):
 		offset, self.labels = decode_labels(self.raw, self.offset)
