@@ -1,4 +1,5 @@
-TESTS!
-======
+TODO
+====
 
-We need tests!
+- More unit tests
+- Label compression
