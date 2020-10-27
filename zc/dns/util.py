@@ -18,7 +18,6 @@ def decode_labels(raw: bytes, offset: int) -> tuple:
 	"""
 	labels = []
 
-	start = offset
 	breakpoint = None
 
 	while offset < len(raw):
