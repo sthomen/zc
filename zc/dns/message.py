@@ -4,6 +4,7 @@ from .data import Data
 from .flags import Flags
 from .record import Record
 from .query import Query
+from .invalidpacket import InvalidPacket
 
 class Message(Data):
 	FORMAT = '!HHHHHH'
@@ -23,6 +24,9 @@ class Message(Data):
 		"""
 		Decode a DNS message
 		"""
+
+		if len(self.raw) < 12:
+			raise InvalidPacket("Packet data was shorter than the header")
 
 		# Read the header
 		(
@@ -78,6 +82,9 @@ class Message(Data):
 
 			# Slot it in place
 			self.records[section].append(record)
+
+		if offset != self.length:
+			raise InvalidPacket(f"Packet length ({self.length} bytes) does not match up with processed data length ({offset} bytes)")
 
 		return self
 

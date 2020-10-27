@@ -3,6 +3,7 @@ from struct import pack, unpack
 from .recordbase import RecordBase
 from .util import sub, decode_labels
 from . import rr
+from .invalidrecord import InvalidRecord
 
 class Record(RecordBase):
 	"""
@@ -22,18 +23,20 @@ class Record(RecordBase):
 		offset, self.labels = decode_labels(self.raw, self.offset)
 		header = sub(self.raw, offset, 10)
 
-		if len(header) == 10:
-			self.type, \
-			self['class'], \
-			self.ttl, \
-			self.rdlength = unpack('!HHIH', header)
+		if len(header) != 10:
+			raise InvalidRecord("There wasn't enough bytes left in the packet to read in the record header")
 
-			offset += 10
+		self.type, \
+		self['class'], \
+		self.ttl, \
+		self.rdlength = unpack('!HHIH', header)
 
-			self.rdata = rr.byType(self.type, self.raw, offset, self.rdlength)
+		offset += 10
 
-			if self.rdata:
-				offset += len(self.rdata)
+		self.rdata = rr.byType(self.type, self.raw, offset, self.rdlength)
+
+		if self.rdata:
+			offset += len(self.rdata)
 
 		self.raw = sub(self.raw, self.offset, offset - self.offset)
 
