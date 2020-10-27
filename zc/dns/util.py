@@ -67,7 +67,7 @@ def encode_labels(labels: list) -> bytes:
 	# append labels prefixed by their length
 	for name in labels:
 		length = len(name)
-		label += pack('!H', length)
+		label += pack('!B', length)
 		label += name
 
 	# The null (root, zero length) label
