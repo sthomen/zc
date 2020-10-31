@@ -25,6 +25,9 @@ class Flags(Data):
 	NOTAUTH  = 9
 	NOTZONE  = 10
 
+	def __init__(self, raw = 0):
+		Data.__init__(self, raw)
+
 	def decode(self):
 		"""
 		Decode message flags
