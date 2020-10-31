@@ -43,6 +43,15 @@ class MulticastListener(socket.socket):
 			socket.inet_aton(addr) + socket.inet_aton(local)
 		)
 
+		# Linux doesn't require this to be set, but BSD systems seem
+		# to need to know the interface (address) to use to send packets
+		# from
+		self.setsockopt(
+			socket.IPPROTO_IP,
+			socket.IP_MULTICAST_IF,
+			socket.inet_aton(local)
+		)
+
 		# Store this for later
 		self.mcast_addr = (addr, port)
 
