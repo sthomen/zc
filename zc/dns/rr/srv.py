@@ -2,7 +2,9 @@ from struct import unpack, pack
 
 from .rdata import RData
 from ..util import sub, decode_labels, encode_labels
+from .rrplugin import RRPlugin
 
+@RRPlugin.register(name='srv', type=33)
 class SRV(RData):
 	def decode(self):
 		header = sub(self.raw, self.offset, 6)

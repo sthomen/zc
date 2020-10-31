@@ -1,7 +1,11 @@
 #!/usr/bin/env python3.7
 
 from zc import MulticastListener
-from zc.dns import Message, Query, Record, rr
+from zc.dns import Message, Query, Record
+from zc.dns.rr import RR
+
+# Initializes RR plugins
+rr = RR()
 
 # Register for listening to mDNS
 listener = MulticastListener().register('224.0.0.251', 5353)
@@ -9,8 +13,7 @@ listener = MulticastListener().register('224.0.0.251', 5353)
 # our query, are there any chromecasts out there?
 query = Query() \
 	.setLabels(b'_googlecast', b'_tcp', b'local') \
-	.setClass(Record.CLASS_IN) \
-	.setType(rr.TYPE_PTR)
+	.setType(rr.typeByName('ptr'))
 
 # Create a message and add our question
 question = Message()
@@ -23,10 +26,12 @@ while True:
 
 	# listener is derived from socket, so we can set a timeout
 	listener.settimeout(1)
+
 	data, remote = listener.receive()
 
 	# timed out
 	if data == None:
+		print("Timed out listening for replies")
 		break
 
 	print(f"--- START Packet from {remote}, {len(data)} bytes\n")

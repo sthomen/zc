@@ -2,7 +2,7 @@ from struct import pack, unpack
 
 from .recordbase import RecordBase
 from .util import sub, decode_labels
-from . import rr
+from .rr import RR
 from .invalidrecord import InvalidRecord
 
 class Record(RecordBase):
@@ -47,7 +47,7 @@ class Record(RecordBase):
 
 		offset += 10
 
-		self.rdata = rr.byType(self.type, self.raw, offset, self.rdlength)
+		self.rdata = RR().byType(self.type, raw=self.raw, offset=offset, length=self.rdlength)
 
 		if self.rdata:
 			offset += len(self.rdata)

@@ -2,7 +2,9 @@ from struct import unpack, pack
 
 from .rdata import RData
 from ..util import sub, decode_labels, encode_labels
+from .rrplugin import RRPlugin
 
+@RRPlugin.register(name='ns', type=2)
 class NS(RData):
 	"""
 	NOTE NOTE NOTE

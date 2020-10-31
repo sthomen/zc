@@ -4,6 +4,7 @@ from .util import sub
 class RecordBase(Data):
 	def __init__(self, raw = None, offset = 0):
 		self.offset = offset
+		self['class'] = 1 # default to IN
 		Data.__init__(self, raw)
 
 	def setLabels(self, *labels):

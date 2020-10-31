@@ -3,7 +3,9 @@ from collections import OrderedDict
 
 from .rdata import RData
 from ..util import sub, decode_labels
+from .rrplugin import RRPlugin
 
+@RRPlugin.register(name='txt', type=16)
 class TXT(RData):
 	"""
 	TXT records are a string of name/value pairs prefixed by their combined length
