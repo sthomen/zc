@@ -5,9 +5,9 @@ from .record import Record
 from . import rr
 
 __all__ = [
-	Message,
-	Flags,
-	Query,
-	Record,
-	rr
+	'Message',
+	'Flags',
+	'Query',
+	'Record',
+	'rr'
 ]
