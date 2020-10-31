@@ -3,14 +3,25 @@ import socket
 class MulticastListener(socket.socket):
 	"""
 	Multicast listener
+
+	This code is very much incomplete, python only produces a thin layer
+	above the system socket implementation, and the ways sockets work on
+	various systems are very different.
+
+	This code should work on linux, windows and (net)BSD, more it cannot
+	promise.
+
+	If you feel like making it better, send me a patch!
 	"""
-	def __init__(self, reuse = True):
+	def __init__(self, reuse = True, ttl = 1):
 		socket.socket.__init__(self, socket.AF_INET, socket.SOCK_DGRAM)
 
 		if (reuse):
 			self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 			if hasattr(socket, "SO_REUSEPORT"):
 				self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+
+		self.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_TTL, ttl)
 
 		self.mcast_addr = None
 
@@ -53,6 +64,7 @@ class MulticastListener(socket.socket):
 		)
 
 		# Store this for later
+		self.local = local
 		self.mcast_addr = (addr, port)
 
 		return self
@@ -67,8 +79,11 @@ class MulticastListener(socket.socket):
 		if not self.mcast_addr:
 			raise IllegalState("Attempted to listen before registering")
 
-		data, remote_addr = self.recvfrom(length)
-		return (data, remote_addr)
+		try:
+			data, remote_addr = self.recvfrom(length)
+			return (data, remote_addr)
+		except socket.timeout:
+			return (None, None)
 
 	def send(self, message):
 		"""
@@ -79,7 +94,10 @@ class MulticastListener(socket.socket):
 		if not self.mcast_addr:
 			raise IllegalState("Attempted to send before registering")
 
-		self.sendto(message, self.mcast_addr)
+		try:
+			return self.sendto(bytes(message), self.mcast_addr)
+		except socket.timeout:
+			return None
 
 	def unregister(self):
 		"""
@@ -89,10 +107,12 @@ class MulticastListener(socket.socket):
 		if not self.mcast_addr:
 			raise IllegalState("Attempted to unregister before registering")
 
+		addr, port = self.mcast_addr
+
 		self.setsockopt(
 			socket.SOL_IP,
-			socket.IP_ADD_MEMBERSHIP,
-			socket.inet_aton(self.addr) + socket.inet_aton('0.0.0.0')
+			socket.IP_DROP_MEMBERSHIP,
+			socket.inet_aton(addr) + socket.inet_aton(self.local)
 		)
 
 		self.mcast_addr = None
