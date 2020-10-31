@@ -9,16 +9,36 @@ from .invalidpacket import InvalidPacket
 class Message(Data):
 	FORMAT = '!HHHHHH'
 
-	# Is anything but 1 used, ever?
-	CLASS_IN = 1
-	CLASS_CS = 2
-	CLASS_CH = 3
-	CLASS_HS = 4
+	QUESTION   = 0
+	ANSWER     = 1
+	NS         = 2
+	ADDITIONAL = 3
 
-	SEC_QUESTION   = 0
-	SEC_ANSWER     = 1
-	SEC_NS         = 2
-	SEC_ADDITIONAL = 3
+	def __init__(self, raw = None):
+		self.flags = Flags()
+
+		self.records = {
+			self.QUESTION:   [],
+			self.ANSWER:     [],
+			self.NS:         [],
+			self.ADDITIONAL: []
+		}
+
+		Data.__init__(self, raw)
+
+	def addRecord(self, section, record):
+		if not -1 < section < 3:
+			raise ValueError(f"Invalid section: {section}")
+
+		self.records[section].append(record)
+
+	def removeRecord(self, section, index):
+		if not -1 < section < 3 and index not in self.records[section]:
+			raise ValueError(f"There's no record {index} in {section}")
+
+		del self.records[section][index]
+
+		return self
 
 	def decode(self):
 		"""
@@ -45,13 +65,6 @@ class Message(Data):
 		offset=12
 		self.length = len(self.raw)
 
-		# Prime records dict
-		self.records = {
-			self.SEC_QUESTION:   [],
-			self.SEC_ANSWER:     [],
-			self.SEC_NS:         [],
-			self.SEC_ADDITIONAL: []
-		}
 
 		# Record the "breakpoints" of the various records, this lets us slot
 		# them in the right section.
@@ -62,7 +75,7 @@ class Message(Data):
 			total += cur
 
 		# Start with questions
-		section = self.SEC_QUESTION
+		section = self.QUESTION
 
 		for index in range(0, total):
 			# If this is not a response (qr = True) then the record format
@@ -94,22 +107,22 @@ class Message(Data):
 		if not self.id:
 			self.id = 0
 
-		self.qcount = len(self.records[self.SEC_QUESTION])
-		self.acount = len(self.records[self.SEC_ANSWER])
-		self.ncount = len(self.records[self.SEC_NS])
-		self.xcount = len(self.records[self.SEC_ADDITIONAL])
+		self.qcount = len(self.records[self.QUESTION])
+		self.acount = len(self.records[self.ANSWER])
+		self.ncount = len(self.records[self.NS])
+		self.xcount = len(self.records[self.ADDITIONAL])
 
 		self.raw += pack(
 			self.FORMAT,
 			self.id,
-			flags.encode().raw,
+			self.flags.encode().raw,
 			self.qcount,
 			self.acount,
 			self.ncount,
 			self.xcount
 		)
 
-		for section in [ self.SEC_QUESTION, self.SEC_ANSWER, self.SEC_NS, self.SEC_ADDITIONAL ]:
+		for section in [ self.QUESTION, self.ANSWER, self.NS, self.ADDITIONAL ]:
 			for item in self.records[section]:
 				self.raw += item.encode().raw
 

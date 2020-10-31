@@ -7,24 +7,25 @@ from .txt import TXT
 from .aaaa import AAAA
 from .srv import SRV
 
-RTYPE_A     = 1
-RTYPE_NS    = 2
-RTYPE_CNAME = 5
-RTYPE_NULL  = 10
-RTYPE_PTR   = 12
-RTYPE_TXT   = 16
-RTYPE_AAAA  = 28
-RTYPE_SRV   = 33
+TYPE_A     = 1
+TYPE_NS    = 2
+TYPE_CNAME = 5
+TYPE_NULL  = 10
+TYPE_PTR   = 12
+TYPE_TXT   = 16
+TYPE_AAAA  = 28
+TYPE_SRV   = 33
+TYPE_ANY   = 255
 
 mapping = {
-	RTYPE_A:     A,
-	RTYPE_NS:    NS,
-	RTYPE_CNAME: CNAME,
-	RTYPE_NULL:  NULL,
-	RTYPE_PTR:   PTR,
-	RTYPE_TXT:   TXT,
-	RTYPE_AAAA:  AAAA,
-	RTYPE_SRV:   SRV
+	TYPE_A:     A,
+	TYPE_NS:    NS,
+	TYPE_CNAME: CNAME,
+	TYPE_NULL:  NULL,
+	TYPE_PTR:   PTR,
+	TYPE_TXT:   TXT,
+	TYPE_AAAA:  AAAA,
+	TYPE_SRV:   SRV
 }
 
 def byType(type, raw, offset, length):

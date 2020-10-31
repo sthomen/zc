@@ -19,7 +19,10 @@ class Data(dict):
 		return self.encode().raw
 
 	def __len__(self):
-		return len(self.raw)
+		if self.raw:
+			return len(self.raw)
+
+		return 0
 
 	def __repr__(self):
 		return ', '.join([ f"{k}: {v}" for k, v in self.items() if k != 'raw' ]).join([f'<{self.__class__.__name__}: ', '>'])

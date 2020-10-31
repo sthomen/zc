@@ -19,6 +19,20 @@ class Record(RecordBase):
 	RDATA    (variable, see rdlength)
 	"""
 
+	CLASS_IN = 1
+	CLASS_CS = 2
+	CLASS_CH = 3
+	CLASS_HS = 4
+
+	def setTTL(self, ttl):
+		self.ttl = ttl
+		return self
+
+	def setData(self, rdata):
+		self.rdata = rdata
+		self.rdlength = len(rdata)
+		return self
+
 	def decode(self):
 		offset, self.labels = decode_labels(self.raw, self.offset)
 		header = sub(self.raw, offset, 10)

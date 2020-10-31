@@ -32,10 +32,7 @@ class Query(RecordBase):
 
 	def encode(self):
 		self.raw = bytes()
-
 		self.raw += encode_labels(self.labels)
-
-		# Pack the header values
 		self.raw += pack('!HH', self.type, self['class'])
 
 		return self
