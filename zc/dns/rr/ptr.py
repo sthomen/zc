@@ -2,7 +2,7 @@ from .rdata import RData
 from ..util import sub, decode_labels, encode_labels
 from .rrplugin import RRPlugin
 
-@RRPlugin.register(name='ptr', type=12)
+@RRPlugin.register(type=12)
 class PTR(RData):
 	def decode(self):
 		offset, self.target = decode_labels(self.raw, self.offset)

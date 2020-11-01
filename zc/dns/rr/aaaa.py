@@ -4,7 +4,7 @@ from .rdata import RData
 from ..util import sub
 from .rrplugin import RRPlugin
 
-@RRPlugin.register(name='aaaa', type=28)
+@RRPlugin.register(type=28)
 class AAAA(RData):
 	def decode(self):
 		self.raw = sub(self.raw, self.offset, 16)
