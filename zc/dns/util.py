@@ -73,3 +73,12 @@ def encode_labels(labels: list) -> bytes:
 	label += b'\x00'
 
 	return label
+
+def b2address(address: list) -> str:
+	return b'.'.join(address).decode('ascii')
+
+def b2ip(address: list) -> str:
+	return '.'.join([ str(x) for x in address])
+
+def b2name(name: bytes) -> str:
+	return name.decode('utf-8')
