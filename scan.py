@@ -3,9 +3,12 @@
 from zc import MulticastListener
 from zc.dns import Message, Query, Record
 from zc.dns.rr import RR
+from zc.dns.util import b2address, b2ip, b2name
 
 # Initializes RR plugins
 rr = RR()
+# Load the typemap, so we can easily get name -> number
+typemap = rr.getTypeMap()
 
 # Register for listening to mDNS
 listener = MulticastListener().register('224.0.0.251', 5353)
@@ -13,14 +16,16 @@ listener = MulticastListener().register('224.0.0.251', 5353)
 # our query, are there any chromecasts out there?
 query = Query() \
 	.setLabels(b'_googlecast', b'_tcp', b'local') \
-	.setType(rr.typeByName('PTR'))
+	.setType(typemap.PTR)
 
 # Create a message and add our question
 question = Message()
 question.addRecord(Message.QUESTION, query)
 
+print("Sending query...")
 listener.send(question)
 
+print("Listening for replies...")
 # Loop while the answers flood in (or not)
 while True:
 
@@ -31,16 +36,42 @@ while True:
 
 	# timed out
 	if data == None:
-		print("Timed out listening for replies")
 		break
 
-	print(f"--- START Packet from {remote}, {len(data)} bytes\n")
 	message = Message(data)
 
-	for section, records in message.records.items():
-		print(f"Section: {section}")
+	# We're only looking for replies (this would otherwise try to parse our
+	# question as well)
+	if message.flags.qr:
 
-		for record in records:
-			print(record)
+		# load answer 0, this should match our query (PTR)
+		answer = message.answer()
 
-	print("\n--- END\n")
+		if answer.type == typemap.PTR:
+			print("Chromecast found at the address:")
+			print(f"  {b2address(answer.rdata.target)}")
+			print()
+		else:
+			print(f"Unexpected answer type {answer.type}")
+			break
+
+		if message.records[Message.ADDITIONAL]:
+			print("Additionally, they tell us that:")
+
+			for record in message.records[Message.ADDITIONAL]:
+				if record.type == typemap.A:
+					print("  The address is:")
+					print(f"   {b2ip(record.rdata.address)}")
+					print()
+
+				elif record.type == typemap.TXT:
+					print("  They have these properties:")
+					for k,v in record.rdata.data.items():
+						print(f'   {b2name(k)}: {b2name(v)}')
+					print()
+
+				elif record.type == typemap.SRV:
+					print("  The service can be found here:")
+					print(f"   {b2address(record.rdata.target)} port {record.rdata.port}")
+					print(f"   weight: {record.rdata.weight}, priority: {record.rdata.priority}")
+					print()
