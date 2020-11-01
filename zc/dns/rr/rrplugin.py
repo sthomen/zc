@@ -1,7 +1,17 @@
 from ...plugin import Plugin
+from ..data import Data
 
 class RRPlugin(Plugin):
 	paths = [ 'zc.dns.rr' ]
+
+	def getTypeMap(self):
+		typemap = Data()
+		
+		for typename, plugin in self.plugins.items():
+			if 'type' in plugin['args']:
+				typemap[typename] = plugin['args']['type']
+
+		return typemap
 
 	def typeByName(self, name):
 		number = None
@@ -22,4 +32,3 @@ class RRPlugin(Plugin):
 				break
 
 		return instance
-				
