@@ -26,11 +26,19 @@ class Message(Data):
 
 		Data.__init__(self, raw)
 
+	def setId(self, number):
+		if not 0 <= number <= 0xff:
+			raise ValueError("The ID number must be between 0 and 255")
+
+		self.id = number
+		return self
+
 	def addRecord(self, section, record):
 		if not -1 < section < 3:
 			raise ValueError(f"Invalid section: {section}")
 
 		self.records[section].append(record)
+		return self
 
 	def removeRecord(self, section, index):
 		if not -1 < section < 3 and index not in self.records[section]:
@@ -39,6 +47,24 @@ class Message(Data):
 		del self.records[section][index]
 
 		return self
+
+	def record(self, section, index = 0):
+		if index < len(self.records[section]):
+			return self.records[section][index]
+
+		return None
+
+	def question(self, index = 0):
+		return self.record(self.QUESTION, index)
+
+	def answer(self, index = 0):
+		return self.record(self.ANSWER, index)
+
+	def ns(self, index = 0):
+		return self.record(self.NS, index)
+
+	def additional(self, index = 0):
+		return self.record(self.ADDITIONAL, index)
 
 	def decode(self):
 		"""
