@@ -15,7 +15,7 @@ listener = MulticastListener().register('224.0.0.251', 5353)
 
 # our query, are there any chromecasts out there?
 query = Query() \
-	.setLabels(b'_googlecast', b'_tcp', b'local') \
+	.setLabels('_googlecast', '_tcp', 'local') \
 	.setType(typemap.PTR)
 
 # Create a message and add our question

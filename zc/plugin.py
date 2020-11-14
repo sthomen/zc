@@ -84,11 +84,14 @@ class Plugin(object):
 		for base in self.paths:
 			path = os.path.join(*base.split('.'))
 
-			for fn in os.listdir(path):
-				fullpath = os.path.join(path, fn)
+			if os.path.exists(path):
+				for fn in os.listdir(path):
+					fullpath = os.path.join(path, fn)
 
-				if os.path.isfile(fullpath) and fn.endswith('.py') and not fn.startswith('__'):
-					__import__('.'.join([ base, fn[:-3] ]), fromlist=[ '*' ])
+					if os.path.isfile(fullpath) and fn.endswith('.py') and not fn.startswith('__'):
+						__import__('.'.join([ base, fn[:-3] ]), fromlist=[ '*' ])
+			else:
+				__import__(base, fromlist = [ '*' ])
 
 	def instance(self, name, config = {}):
 		"""
