@@ -14,9 +14,9 @@ class RecordBase(Data):
 
 		A label MUST be a list of bytes
 
-		:param labels list: a list of bytes objects
+		:param labels list: a list of bytes or str objects
 		"""
-		self.labels = list(labels)
+		self.labels = [ l if type(l) is bytes else bytes(l, 'utf-8') for l in labels ]
 		return self
 
 	def setClass(self, cls):
