@@ -1,10 +1,9 @@
 class Data(dict):
-	"""
-	Handy data class stub for binary data.
-	Do not instantiate directly, use a subclass.
-	"""
 	def __init__(self, raw = None):
 		"""
+		Handy data class stub for binary data.
+		Do not instantiate directly, use a subclass.
+
 		Initialize data class with the raw, decoding it automatically
 		if set (not None)
 
